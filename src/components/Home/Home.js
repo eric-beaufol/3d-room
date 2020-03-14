@@ -26,10 +26,14 @@ class Home extends React.Component {
   constructor(props) {
     super(props)
 
-    this.gravity = -10
+    this.gravityX = 0
+    this.gravityY = -10
+    this.rotateGravity = false
     this.hasToAddBox = false
     this.rotate = false
     this.rotateSpeed = 0.01
+    this.rotateGravitySpeed = 0.001
+    this.rotateGravityAmplitude = 1
 
     this.canvas = React.createRef()
     this.animate = this.animate.bind(this)
@@ -74,7 +78,13 @@ class Home extends React.Component {
 
     // Dat.gui
     const gui = new dat.GUI()
-    gui.add(this, 'gravity', -10, 10).step(.1)
+    const gravityFolder = gui.addFolder('gravity')
+    gravityFolder.add(this, 'gravityX', -10, 10).step(.1).listen()
+    gravityFolder.add(this, 'gravityY', -10, 10).step(.1).listen()
+    gravityFolder.add(this, 'rotateGravity').name('auto rotate')
+    gravityFolder.add(this, 'rotateGravitySpeed', 0.0001, 0.005).name('speed')
+    gravityFolder.add(this, 'rotateGravityAmplitude', 1, 10).name('amplitude')
+    gravityFolder.open()
 
     const boxesFolder = gui.addFolder('boxes')
     boxesFolder.add(this, 'hasToAddBox').name('stream boxes')
@@ -168,7 +178,7 @@ class Home extends React.Component {
     room.body = body
     world.add(room.body)
   }
-  
+
   addBox() {
     const size = .4
     const body = new CANNON.Body({mass: 1})
@@ -217,10 +227,15 @@ class Home extends React.Component {
       room.body.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 0, 1), rotateY)
     }
 
+    if (this.rotateGravity) {
+      this.gravityX = Math.cos(time * this.rotateGravitySpeed) * this.rotateGravityAmplitude
+      this.gravityY = Math.sin(time * this.rotateGravitySpeed) * this.rotateGravityAmplitude
+    }
+
     room.position.copy(room.body.position)
     room.quaternion.copy(room.body.quaternion)
 
-    world.gravity.set(0, this.gravity, 0)
+    world.gravity.set(this.gravityX, this.gravityY, 0)
 
     boxes.forEach(mesh => {
       mesh.position.copy(mesh.body.position)
