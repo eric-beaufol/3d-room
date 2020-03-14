@@ -1,0 +1,11 @@
+.button {
+  display: inline-block;
+  padding: 5px;
+  border: 0;
+  font-size: 1em;
+  text-decoration: none;
+  font-family: 'Roboto', sans-serif;
+  border-radius: .2em;
+  cursor: pointer;
+  outline: none;
+}
