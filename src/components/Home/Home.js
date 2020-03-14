@@ -15,6 +15,9 @@ let world, lastTime
 // Mixed
 let boxes = []
 
+// UI
+let cubeDelay = 0
+
 // Stats.js
 let stats
 
@@ -24,15 +27,16 @@ class Home extends React.Component {
     super(props)
 
     this.gravity = -10
+    this.hasToAddBox = false
 
     this.canvas = React.createRef()
     this.animate = this.animate.bind(this)
+    this.handleMouseDown = this.handleMouseDown.bind(this)
   }
 
   componentDidMount() {
     this.init()
     this.animate()
-    // setInterval(this.addBox, 100)
   }
 
   init() {
@@ -53,6 +57,7 @@ class Home extends React.Component {
     camera = new THREE.PerspectiveCamera(75, innerWidth / innerHeight, .1, 1000)
     camera.position.set(0, 0, 2)
     controls = new OrbitControls(camera, this.canvas)
+    controls.enabled = false
 
     scene.add(new THREE.AxesHelper())
 
@@ -70,7 +75,13 @@ class Home extends React.Component {
     const gui = new dat.GUI()
     gui.add(this, 'gravity', -10, 10)
 
-    console.log(this)
+    const boxesFolder = gui.addFolder('boxes')
+    boxesFolder.add(this, 'hasToAddBox').name('stream boxes')
+    boxesFolder.add(this, 'addBox')
+
+    const controlsFolder = gui.addFolder('controls')
+    controlsFolder.add(controls, 'enabled')
+    controlsFolder.add(controls, 'reset')
 
     this.addRoom()
   }
@@ -182,6 +193,15 @@ class Home extends React.Component {
   }
 
   update(time) {
+    if (this.hasToAddBox) {
+      if (!cubeDelay) {
+        this.addBox()
+        cubeDelay = 10
+      } else {
+        cubeDelay--
+      }
+    }
+
     world.gravity.set(0, this.gravity, 0)
 
     boxes.forEach(mesh => {
@@ -198,10 +218,18 @@ class Home extends React.Component {
     lastTime = time
   }
 
+  handleMouseDown(e) {
+    this.hasToAddBox = true
+  }
+  
+  handleMouseUp(e) {
+    this.hasToAddBox = false
+  }
+
   render() {
     return (
       <div className={styles.container}>
-        <canvas ref={el => { this.canvas = el }}/>
+        <canvas ref={el => { this.canvas = el }} onMouseDown={this.handleMouseDown} onMouseUp={this.handleMouseUp}/>
       </div>
     )
   }
