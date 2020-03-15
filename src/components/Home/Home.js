@@ -123,7 +123,7 @@ class Home extends React.Component {
     room.add(back)
 
     const front = new THREE.Mesh(planeGeom, planeMat)
-    front.visible = false
+    front.rotation.y = Math.PI
     room.add(front)
 
     const left = new THREE.Mesh(planeGeom, planeMat)
