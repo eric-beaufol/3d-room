@@ -12,7 +12,7 @@
     "react-dom": "^16.8.4",
     "react-router-dom": "^5.0.0",
     "stats.js": "^0.17.0",
-    "three": "^0.111"
+    "three": "^0.137"
   },
   "devDependencies": {
     "@babel/core": "^7.4.0",
